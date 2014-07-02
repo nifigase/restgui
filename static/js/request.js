@@ -5,7 +5,7 @@ var request_js_config = {
 	crossdomain: false,
 	services_jsdls: {},
 	service_groups_list: [],
-	loaded_templates: {},
+	loaded_templates: {}
 };
 
 function get_template(name) {
