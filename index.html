@@ -1,0 +1,120 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+  <head>
+    <title>NBO Administrative Interface</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="Access-Control-Allow-Origin" content="*"/>
+    <meta http-equiv="Access-Control-Allow-Methods" content="OPTIONS,GET,PUT,POST,DELETE"/>
+    <meta http-equiv="Access-Control-Max-Age" content="1000"/>
+    
+    <link rel="stylesheet" type="text/css" href="static/css/style.css"/>
+    
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="static/js/underscore-min.js"></script>
+    <script type="text/javascript" src="static/js/tv4.js"></script>
+    
+    <script type="text/template" id="form_template">
+<!-- params = {op: operation_hash, opname: str, servname: str} -->
+<% var tblid = 'form_tbl_' + servname + '_' + opname; %>
+<% var formid = 'form_' + servname + '_' + opname; %>
+<div class="fieldset">
+<form name="<%= formid %>" id="<%= formid %>" method="post" enctype="multipart/form-data"
+  onsubmit="return make_form_request('<%= servname %>', '<%= opname %>');">
+  <fieldset>
+    <legend>
+      <a class="fake_link" href="javascript:showHideForm('<%= tblid %>');"><%= op.description %></a>
+    </legend> 
+    <table class="form_content" id="<%= tblid %>">
+     <% _.each(op.parameters, function(param) { %>
+      <tr>
+        <td class="desc">
+           <%= param.description %>
+        </td>
+        <td>
+          <%= _.template(param_template, {param: param, opname: opname, servname: servname}) %>
+        </td>
+      </tr>
+     <% }); %>
+    <tr><td colspan="2">
+      <input type="hidden" name="FormId" value="<%= opname %>"/>
+      <input type="submit"/>    
+    </td></tr>
+    </table>
+  </fieldset>
+</form>
+</div>
+    </script>
+    <script type="text/template" id="param_template">
+<!-- params = {param: param_hash, opname: str, servname: str} -->
+<% if(param.type == 'string' && !('enum' in param)) { %>
+  <input type="text" id="<%= param.name %>" name="<%= param.name %>"
+  onchange="return check_string('<%= servname %>', '<%= opname %>', '<%= param.name %>', this.value);"/>
+<% } %>
+<% if(param.type == 'number' || param.type == 'integer') { %>
+  <input type="text" id="<%= param.name %>" name="<%= param.name %>"
+  onchange="return check_number('<%= servname %>', '<%= opname %>', '<%= param.name %>', this.value);"/>
+<% } %>
+<% if(param.type == 'string' && ('enum' in param)) { %>
+  <select id="<%= param.name %>" name="<%= param.name %>">
+    <% _.each(param.enum, function(e) { %>
+       <option value="<%= e %>"><%= e %></option>
+    <% }); %>
+  </select>
+<% } %>
+<% if(param.type == 'multistring') { %>
+  <textarea id="<%= param.name %>" name="<%= param.name %>"></textarea>
+<% } %>
+<% if(param.type == 'boolean') { %>
+  <input type="checkbox" id="<%= param.name %>" name="<%= param.name %>"
+    <% if(param.default) { %>
+      value="yes" checked="checked"
+    <% } %>
+  ></input>
+<% } %>
+    </script>
+    
+    <script type="text/javascript" src="static/js/jsdl_schema.js"></script>
+    <script type="text/javascript" src="static/js/util.js"></script>
+    <script type="text/javascript" src="static/js/request.js"></script>
+    <script type="text/javascript">
+        request_js_config.crossdomain = true;
+        request_js_config.root_url_in_qs = true;
+    </script>
+  </head>
+  <body>
+    <div class="header">
+      <img src="static/oix_beta.gif"/>
+    </div>
+    <div id="resultDiv"></div>
+    
+    <div class="fieldset">
+	    <a class="fake_link" href="javascript:showHideForm('apis_tbl');">Select or enter API server URL</a>
+	    
+	    <form name="apis_frm" id="apis_frm" method="get" enctype="multipart/form-data">
+	    <table class="form_content" id="apis_tbl">
+	      <tr>
+	        <td colspan="3">
+	          <ul>
+	          <li><a href="index.html?root_url=dev.ocslab.com:8008/nbo/ProvApi">NBO API at dev:8008</a></li>
+	          <li><a href="index.html?root_url=dev.ocslab.com:8801/proxy">WebIndex API at dev:8801</a></li>
+	          </ul>
+	        </td>
+	      </tr>
+	      <tr>
+	        <td>Enter root URL:</td>
+	        <td>
+	          <input type="text" size="35" name="root_url" value="dev.ocslab.com:8008/nbo/ProvApi"/>
+	        </td>
+	        <td>
+			      <input type="submit"/>
+			    </td>
+	      </tr>
+	    </table>
+	    </form>
+    
+    </div>
+    
+  </body>
+</html>
